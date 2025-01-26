@@ -22,7 +22,13 @@ function forwardVideos() {
     "div.ad-simple-attributed-string.ytp-ad-badge__text"
   );
   console.log("Ad badge text found:", adBadgeText !== null);
-  if (adButtonIcon || adBadgeText) {
+
+  const adAvatarDescription = document.querySelector(
+    "div.ad-simple-attributed-string.ytp-ad-avatar-lockup-card__description"
+  );
+  console.log("Ad avatar description found:", adAvatarDescription !== null);
+
+  if (adButtonIcon || adBadgeText || adAvatarDescription) {
     console.log("Reklam bulundu, video ileri sarılıyor."); // Konsola çıktı ver
     const mediaTags = Array.from(document.querySelectorAll("video"));
     mediaTags.forEach((video) => {
