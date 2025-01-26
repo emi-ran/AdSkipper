@@ -1,3 +1,5 @@
+console.log("Script is running...");
+
 function seekForward(video, seconds) {
   if (video && video.duration) {
     // Netflix için özel durum kontrolü
@@ -14,7 +16,13 @@ function forwardVideos() {
   console.log("Reklam kontrol ediliyor..."); // Her saniye kontrol edildiğini görmek için
   // Reklam elementini daha spesifik bir seçici ile ara
   const adButtonIcon = document.querySelector("span.ytp-ad-button-icon");
-  if (adButtonIcon) {
+  console.log("Ad button icon found:", adButtonIcon !== null);
+
+  const adBadgeText = document.querySelector(
+    "div.ad-simple-attributed-string.ytp-ad-badge__text"
+  );
+  console.log("Ad badge text found:", adBadgeText !== null);
+  if (adButtonIcon || adBadgeText) {
     console.log("Reklam bulundu, video ileri sarılıyor."); // Konsola çıktı ver
     const mediaTags = Array.from(document.querySelectorAll("video"));
     mediaTags.forEach((video) => {
@@ -24,7 +32,7 @@ function forwardVideos() {
 }
 
 if (window.location.href.startsWith("https://www.youtube.com/watch?v")) {
-  window.addEventListener("load", function () {
+  document.addEventListener("DOMContentLoaded", function () {
     const observer = new MutationObserver(function (mutationsList) {
       for (let mutation of mutationsList) {
         if (mutation.type === "childList") {
