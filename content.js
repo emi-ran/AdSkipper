@@ -1,54 +1,37 @@
-console.log("Script is running...");
+function skipAd() {
+  const videoPlayer = document.querySelector('#movie_player');
+  if (!videoPlayer) return;
 
-function seekForward(video, seconds) {
-  if (video && video.duration) {
-    // Netflix için özel durum kontrolü
-    if (window.location.hostname === "www.youtube.com") {
-      video.currentTime = Math.min(video.currentTime + seconds, video.duration);
-    } else {
-      // Diğer siteler için varsayılan davranış
-      video.currentTime += seconds;
+  // Reklamları tespit etmenin en güvenilir yolu, oynatıcıdaki 'ad-showing' sınıfıdır.
+  const isAdPlaying = videoPlayer.classList.contains('ad-showing');
+
+  // Ek bir teyit olarak görünür bir reklam kapsayıcısı olup olmadığını da kontrol ediyoruz.
+  // Bu, algılamayı daha sağlam hale getirir ve reklam olmayan içeriklerde tetiklenmesini önler.
+  const adContainer = document.querySelector('.ytp-ad-module, .video-ads, .ytp-ad-overlay-container');
+
+  if (isAdPlaying && adContainer) {
+    const video = document.querySelector('video');
+    // Videonun süresi geçerli bir sayı ise ve sıfırdan büyükse reklamı atla
+    if (video && video.duration > 0 && !isNaN(video.duration)) {
+      // currentTime'ı süreye ayarlamak reklamı etkili bir şekilde atlar.
+      video.currentTime = video.duration;
     }
   }
 }
 
-function forwardVideos() {
-  console.log("Reklam kontrol ediliyor..."); // Her saniye kontrol edildiğini görmek için
-  // Reklam elementini daha spesifik bir seçici ile ara
-  const adButtonIcon = document.querySelector("span.ytp-ad-button-icon");
-  console.log("Ad button icon found:", adButtonIcon !== null);
+// MutationObserver, DOM değişikliklerini (bir reklamın başlaması ve 'ad-showing'
+// sınıfının eklenmesi gibi) verimli bir şekilde algılar.
+const observer = new MutationObserver(() => {
+  skipAd();
+});
 
-  const adBadgeText = document.querySelector(
-    "div.ad-simple-attributed-string.ytp-ad-badge__text"
-  );
-  console.log("Ad badge text found:", adBadgeText !== null);
+// YouTube'un oynatıcısı karmaşık olabildiğinden ve yeniden oluşturulabildiğinden,
+// tüm body'yi gözlemlemek daha güvenli bir yaklaşımdır.
+observer.observe(document.body, {
+  childList: true,
+  subtree: true,
+});
 
-  const adAvatarDescription = document.querySelector(
-    "div.ad-simple-attributed-string.ytp-ad-avatar-lockup-card__description"
-  );
-  console.log("Ad avatar description found:", adAvatarDescription !== null);
-
-  if (adButtonIcon || adBadgeText || adAvatarDescription) {
-    console.log("Reklam bulundu, video ileri sarılıyor."); // Konsola çıktı ver
-    const mediaTags = Array.from(document.querySelectorAll("video"));
-    mediaTags.forEach((video) => {
-      seekForward(video, 60); // Reklam bulunduğunda 60 saniye ileri al
-    });
-  }
-}
-
-if (window.location.href.startsWith("https://www.youtube.com/watch?v")) {
-  document.addEventListener("DOMContentLoaded", function () {
-    const observer = new MutationObserver(function (mutationsList) {
-      for (let mutation of mutationsList) {
-        if (mutation.type === "childList") {
-          forwardVideos();
-        }
-      }
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
-  });
-
-  // Her saniye forwardVideos fonksiyonunu çalıştır
-  setInterval(forwardVideos, 1000);
-}
+// Bir yedek interval, gözlemcinin tetiklenmemesi durumunda reklamları
+// kaçırmamamızı sağlar.
+setInterval(skipAd, 500);
