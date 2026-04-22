@@ -1,71 +1,28 @@
-function clickIfPresent(selector) {
-  const element = document.querySelector(selector);
-  if (!element) return;
-
-  if (typeof element.click === 'function') {
-    element.click();
-  }
-
-  ['pointerdown', 'mousedown', 'pointerup', 'mouseup', 'click'].forEach((eventName) => {
-    element.dispatchEvent(new MouseEvent(eventName, {
-      bubbles: true,
-      cancelable: true,
-      view: window,
-    }));
-  });
-}
-
-function removeElements(selector) {
-  document.querySelectorAll(selector).forEach((element) => {
-    element.remove();
-  });
-}
-
-function removeSearchAds() {
-  removeElements('ytd-search-pyv-renderer, ytd-ad-slot-renderer');
-
-  document
-    .querySelectorAll('a[href*="googleadservices.com/pagead/aclk"]')
-    .forEach((link) => {
-      link.closest('ytd-search-pyv-renderer, ytd-ad-slot-renderer')?.remove();
-    });
-}
-
 function skipAd() {
   const videoPlayer = document.querySelector('#movie_player');
   if (!videoPlayer) return;
 
-  // YouTube reklam durumunu doğrudan oynatıcı sınıfı üzerinden işaretliyor.
+  // Reklamları tespit etmenin en güvenilir yolu, oynatıcıdaki 'ad-showing' sınıfıdır.
   const isAdPlaying = videoPlayer.classList.contains('ad-showing');
 
-  clickIfPresent('.ytp-ad-skip-button, .ytp-ad-skip-button-modern, .ytp-skip-ad-button, .videoAdUiSkipButton');
-  clickIfPresent('.ytp-ad-overlay-close-button');
+  // Ek bir teyit olarak görünür bir reklam kapsayıcısı olup olmadığını da kontrol ediyoruz.
+  // Bu, algılamayı daha sağlam hale getirir ve reklam olmayan içeriklerde tetiklenmesini önler.
+  const adContainer = document.querySelector('.ytp-ad-module, .video-ads, .ytp-ad-overlay-container');
 
-  if (!isAdPlaying) return;
-
-  const video = videoPlayer.querySelector('video') || document.querySelector('video');
-  if (video && Number.isFinite(video.duration) && video.duration > 0) {
-    // Skip butonu sentetik tıklamayı reddettiğinde reklamı doğrudan sona taşı.
-    const targetTime = Math.max(video.duration - 0.1, 0);
-    if (video.currentTime < targetTime) {
-      video.currentTime = targetTime;
-    }
-
-    if (video.playbackRate < 16) {
-      video.playbackRate = 16;
+  if (isAdPlaying && adContainer) {
+    const video = document.querySelector('video');
+    // Videonun süresi geçerli bir sayı ise ve sıfırdan büyükse reklamı atla
+    if (video && video.duration > 0 && !isNaN(video.duration)) {
+      // currentTime'ı süreye ayarlamak reklamı etkili bir şekilde atlar.
+      video.currentTime = video.duration;
     }
   }
-}
-
-function runAdSkipper() {
-  removeSearchAds();
-  skipAd();
 }
 
 // MutationObserver, DOM değişikliklerini (bir reklamın başlaması ve 'ad-showing'
 // sınıfının eklenmesi gibi) verimli bir şekilde algılar.
 const observer = new MutationObserver(() => {
-  runAdSkipper();
+  skipAd();
 });
 
 // YouTube'un oynatıcısı karmaşık olabildiğinden ve yeniden oluşturulabildiğinden,
@@ -78,6 +35,3 @@ observer.observe(document.body, {
 // Bir yedek interval, gözlemcinin tetiklenmemesi durumunda reklamları
 // kaçırmamamızı sağlar.
 setInterval(skipAd, 500);
-setInterval(removeSearchAds, 500);
-
-runAdSkipper();

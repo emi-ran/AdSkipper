@@ -1,15 +1,10 @@
 # YouTube Reklam Atlayıcı
 
-YouTube videolarındaki reklamları otomatik olarak atlamanızı sağlayan bir Chrome uzantısı. Reklam oynatılmaya başlandığında reklam videosunu sona yaklaştırır, varsa "Atla" düğmesine basmayı dener, overlay reklamlarını kapatır ve arama sonuçlarındaki sponsorlu reklam kartlarını kaldırır.
+YouTube videolarındaki reklamları otomatik olarak atlamanızı sağlayan bir Chrome uzantısı. Reklam oynatılmaya başlandığı anda reklamı sonlandırır ve "Atla" butonunun çıkmasını sağlar. (Henüz atla butonuna otomatik olarak basan bir kod yazamadım, ne denesem de işe yaramadı.)
 
 ## Özellikler
 
-- YouTube videolarının reklam bölümlerini hızlıca atlamayı dener.
-- Varsa reklamdaki "Atla" düğmesine otomatik olarak basar.
-- Farklı YouTube "Atla" düğmesi varyantlarında manuel tıklamaya daha yakın bir tetikleme kullanır.
-- Sentetik tıklamanın reddedildiği reklamlarda videoyu sona yaklaştırıp hızlandırarak çıkmayı dener.
-- Overlay reklamlarını kapatmayı dener.
-- Arama sonuçlarındaki sponsorlu reklam kartlarını kaldırır.
+- YouTube videolarının reklam bölümlerini hızlıca atlamanızı sağlar.
 
 ## Kullanım
 
@@ -17,22 +12,13 @@ YouTube videolarındaki reklamları otomatik olarak atlamanızı sağlayan bir C
 2. Google Chrome tarayıcısında `chrome://extensions/` adresine gidin.
 3. Sağ üst köşedeki `Geliştirici Modu (Developer mode)` seçeneğini açın.
 4. `Paketlenmemiş öğe yükle (Load unpacked)` butonuna tıklayın ve uzantınızın bulunduğu klasörü seçin.
-5. YouTube'da video sayfalarında reklam atlama, arama sayfalarında ise sponsorlu sonuç kaldırma otomatik olarak çalışacaktır.
+5. YouTube'da bir video izlerken, reklamlar otomatik olarak atlanacaktır.
 
 ## Teknolojiler
 
 - JavaScript (Chrome Extension API)
-- Chrome Extension Manifest V3
 - HTML/CSS (Popup Arayüzü)
 - MutationObserver API (Reklamları tespit etmek için)
-
-## Proje Yapısı
-
-- `manifest.json`: Uzantı yapılandırması ve içerik scripti tanımı
-- `content.js`: Video reklam atlama ve arama reklamı kaldırma mantığı
-- `popup.html`: Uzantı popup arayüzü
-- `assets/`: İkon ve popup içinde kullanılan görseller
-- `example.html`, `example2.html`, `example3.html`, `example4.html`: Reklam varyantlarını incelemek için örnek HTML çıktıları
 
 ## Katkı
 
